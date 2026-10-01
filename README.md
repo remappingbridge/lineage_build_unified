@@ -6,7 +6,7 @@ The only intentional functional customization is the replacement of LineageOS Tr
 
 ```text
 remappingbridge/trebuchet-lineage-22.2
-0dc553b3eca0ff167eade41a7458014a493af86a
+0c24a7362d95fe3685714f8b8cb1ef25ae12fad3
 ```
 
 Do **not** add Wi-Fi workarounds to this branch before the first physical build. Wi-Fi is being used as a baseline regression check.
