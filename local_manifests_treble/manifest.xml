@@ -1,9 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-  <project name="AndyCGYan/android_device_lineage_gsi" path="device/lineage/gsi" remote="github" revision="lineage-22" />
-  <project name="AndyCGYan/android_packages_apps_QcRilAm" path="packages/apps/QcRilAm" remote="github" revision="master" />
-  <project name="TrebleDroid/vendor_hardware_overlay" path="vendor/hardware_overlay" remote="github" revision="pie" />
+  <!-- Andy Yan LineageOS 22 Light components frozen around the 2025-06-21 release. -->
+  <project name="AndyCGYan/android_device_lineage_gsi"
+           path="device/lineage/gsi"
+           remote="github"
+           revision="b529f626be220d441f1293dacb4c28112fbfae95" />
+  <project name="AndyCGYan/android_packages_apps_QcRilAm"
+           path="packages/apps/QcRilAm"
+           remote="github"
+           revision="dc599b67cc1e7e9a62ca15eef605e3b2546d0d42" />
+  <project name="TrebleDroid/vendor_hardware_overlay"
+           path="vendor/hardware_overlay"
+           remote="github"
+           revision="2b84b6e5e6f04fbcf2d122bf985753c6b9c9bbca" />
+
+  <!-- Keep the Light GSI camera choice from Andy Yan's original manifest. -->
   <remove-project name="LineageOS/android_packages_apps_Camera2" />
+
+  <!-- P11 experiment: replace only Trebuchet with the source commit carrying
+       the Magic Trackpad four-finger customization. The "private" remote is
+       defined by the LineageOS root manifest and resolves through SSH. -->
+  <remove-project name="LineageOS/android_packages_apps_Trebuchet" />
+  <project name="remappingbridge/trebuchet-lineage-22.2"
+           path="packages/apps/Trebuchet"
+           remote="private"
+           revision="0dc553b3eca0ff167eade41a7458014a493af86a"
+           groups="pdk-fs,sysui-studio,pdk-cw-tvc" />
+
   <remote name="gitlab" fetch="https://gitlab.com/" />
-  <project name="MindTheGapps/vendor_gapps" path="vendor/gapps" remote="gitlab" revision="vic" />
+  <project name="MindTheGapps/vendor_gapps"
+           path="vendor/gapps"
+           remote="gitlab"
+           revision="vic" />
 </manifest>
