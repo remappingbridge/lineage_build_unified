@@ -38,7 +38,7 @@ The LineageOS Trebuchet project is removed from the local manifest and replaced 
 ```text
 repository: remappingbridge/trebuchet-lineage-22.2
 source branch used to create the commit: experimental/trackpad-4finger-allapps-home
-pinned commit: 0c24a7362d95fe3685714f8b8cb1ef25ae12fad3
+pinned commit: 96ddd23a6400962798c6d119ef165594425137f8
 path: packages/apps/Trebuchet
 ```
 
