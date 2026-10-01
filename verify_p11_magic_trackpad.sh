@@ -27,7 +27,7 @@ check_repo() {
 echo "Verifying P11 Magic Trackpad source pins..."
 echo
 
-check_repo "packages/apps/Trebuchet"     "0dc553b3eca0ff167eade41a7458014a493af86a"     "Trebuchet Magic Trackpad"
+check_repo "packages/apps/Trebuchet"     "0c24a7362d95fe3685714f8b8cb1ef25ae12fad3"     "Trebuchet Magic Trackpad"
 
 check_repo "device/lineage/gsi"     "b529f626be220d441f1293dacb4c28112fbfae95"     "Andy Yan GSI device tree"
 
