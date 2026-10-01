@@ -24,7 +24,7 @@
   <project name="remappingbridge/trebuchet-lineage-22.2"
            path="packages/apps/Trebuchet"
            remote="private"
-           revision="0c24a7362d95fe3685714f8b8cb1ef25ae12fad3"
+           revision="96ddd23a6400962798c6d119ef165594425137f8"
            groups="pdk-fs,sysui-studio,pdk-cw-tvc" />
 
   <remote name="gitlab" fetch="https://gitlab.com/" />
