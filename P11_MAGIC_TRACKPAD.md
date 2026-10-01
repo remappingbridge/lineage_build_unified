@@ -38,11 +38,13 @@ The LineageOS Trebuchet project is removed from the local manifest and replaced 
 ```text
 repository: remappingbridge/trebuchet-lineage-22.2
 source branch used to create the commit: experimental/trackpad-4finger-allapps-home
-pinned commit: 0dc553b3eca0ff167eade41a7458014a493af86a
+pinned commit: 0c24a7362d95fe3685714f8b8cb1ef25ae12fad3
 path: packages/apps/Trebuchet
 ```
 
-That commit changes only:
+The Trackpad implementation originates in commit `0dc553b3eca0ff167eade41a7458014a493af86a`; the pinned commit above also adapts `SystemUiProxy` to the current LineageOS 22.2 `onKeyEvent(int)` interface.
+
+The Trackpad implementation changes:
 
 ```text
 quickstep/src/com/android/quickstep/TouchInteractionService.java
