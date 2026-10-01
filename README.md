@@ -1,27 +1,57 @@
+# LineageOS 22 Light — P11 Magic Trackpad experiment
 
-## Building "generic" LineageOS GSIs ##
+This branch is a controlled Lenovo Tab P11 experiment based on Andy Yan's `lineage-22-light` build recipe.
 
-Set up your environment by referring to [LineageOS Wiki](https://wiki.lineageos.org/devices/TP1803/build) (mainly "Install the build packages" and "Install the repo command").
+The only intentional functional customization is the replacement of LineageOS Trebuchet with the pinned Magic Trackpad implementation from:
 
-Create a new working directory for your LineageOS build and navigate to it:
+```text
+remappingbridge/trebuchet-lineage-22.2
+0dc553b3eca0ff167eade41a7458014a493af86a
+```
 
-    mkdir lineage-22-build-gsi; cd lineage-22-build-gsi
+Do **not** add Wi-Fi workarounds to this branch before the first physical build. Wi-Fi is being used as a baseline regression check.
 
-Initialize your LineageOS workspace:
+Full source pins, build commands, known reproducibility limitations and the physical acceptance checklist are documented in:
 
-    repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
+```text
+P11_MAGIC_TRACKPAD.md
+```
 
-Clone both this and the patches repos:
+## Workspace
 
-    git clone https://github.com/AndyCGYan/lineage_build_unified lineage_build_unified -b lineage-22-light
-    git clone https://github.com/AndyCGYan/lineage_patches_unified lineage_patches_unified -b lineage-22-light
+```bash
+mkdir -p ~/lineage-22-build-gsi
+cd ~/lineage-22-build-gsi
 
-Finally, start the build script - for example, to build for all supported archs:
+repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
 
-    bash lineage_build_unified/build_unified.sh treble 64VN 64GN
+git clone -b experimental/p11-magic-trackpad \
+  https://github.com/remappingbridge/lineage_build_unified.git \
+  lineage_build_unified
 
-Be sure to update the cloned repos from time to time!
+git clone -b lineage-22-light \
+  https://github.com/remappingbridge/lineage_patches_unified.git \
+  lineage_patches_unified
+```
 
----
+The custom Trebuchet repository is private. Confirm GitHub SSH access before syncing:
 
-This script is also used to make device-specific and/or personal builds. To do so, understand the script, and try the `device` and `personal` keywords.
+```bash
+git ls-remote git@github.com:remappingbridge/trebuchet-lineage-22.2.git HEAD
+```
+
+## Target
+
+For the P11 GApps/no-root ARM64 GSI:
+
+```bash
+bash lineage_build_unified/build_unified.sh treble 64GN
+```
+
+Before physical validation, verify the pinned repositories:
+
+```bash
+bash lineage_build_unified/verify_p11_magic_trackpad.sh
+```
+
+See `P11_MAGIC_TRACKPAD.md` before building.
