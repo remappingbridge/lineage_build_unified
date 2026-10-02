@@ -1,64 +1,76 @@
-# LineageOS 22 Light — P11 Magic Trackpad experiment
+# LineageOS 22 Light — Lenovo Tab P11 stock-kernel Wi-Fi + Magic Trackpad profile
 
-This branch is a controlled Lenovo Tab P11 experiment based on Andy Yan's `lineage-22-light` build recipe.
+This branch preserves the working Magic Trackpad gesture stack while removing the
+kernel rebuild from the P11 runtime path.
 
-**2026-10-02 update:** the first GSI built and booted; Wi-Fi and pointer work, but
-2/3/4-finger gestures fail because the stock kernel exposes no MT2 multitouch.
-An opt-in Bluetooth/UHID bridge is now available in
-[p11/mt2-bridge](p11/mt2-bridge/README.md). It has host tests; Android compilation
-and physical acceptance remain pending. Follow its incremental instructions for
-the existing build tree. It is not automatically applied by the full build recipe.
+## Why
 
-The original build recipe's functional customization is the replacement of LineageOS Trebuchet with the pinned Magic Trackpad implementation from:
+Physical testing established two separate facts:
+
+- the rebuilt P11 `4.19.157-perf+` kernel can expose Magic Trackpad 2 multitouch,
+  but Wi-Fi can be enabled without discovering nearby networks;
+- the known-good Andy Yan LineageOS 22.2 GSI scans/connects on the Lenovo stock
+  kernel/vendor combination.
+
+The Wi-Fi regression therefore must not be "fixed" in Trebuchet. The P11 profile
+keeps the pinned Trebuchet gesture customization and applies the MT2
+Bluetooth/UHID bridge in the Android Bluetooth stack, allowing the **stock Lenovo
+boot/kernel** to remain in use for Qualcomm WLAN compatibility.
+
+## Pinned Trebuchet
 
 ```text
-remappingbridge/trebuchet-lineage-22.2
-96ddd23a6400962798c6d119ef165594425137f8
+repository: remappingbridge/trebuchet-lineage-22.2
+commit: 96ddd23a6400962798c6d119ef165594425137f8
+source branch: experimental/trackpad-4finger-allapps-home
 ```
 
-Do **not** add Wi-Fi workarounds to this branch before the first physical build. Wi-Fi is being used as a baseline regression check.
+## Build
 
-Full source pins, build commands, known reproducibility limitations and the physical acceptance checklist are documented in:
-
-```text
-P11_MAGIC_TRACKPAD.md
-```
-
-## Workspace
+Use this branch of `lineage_build_unified` and the existing
+`lineage_patches_unified:lineage-22-light` checkout.
 
 ```bash
-mkdir -p ~/lineage-22-build-gsi
-cd ~/lineage-22-build-gsi
-
-repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs
-
-git clone -b experimental/p11-magic-trackpad \
-  https://github.com/remappingbridge/lineage_build_unified.git \
-  lineage_build_unified
-
-git clone -b lineage-22-light \
-  https://github.com/remappingbridge/lineage_patches_unified.git \
-  lineage_patches_unified
+bash lineage_build_unified/build_unified.sh treble p11 64GN
 ```
 
-The custom Trebuchet repository is private. Confirm GitHub SSH access before syncing:
+The `p11` profile:
+
+1. applies the MT2 Bluetooth/UHID bridge;
+2. verifies all pinned P11 sources and that the bridge is integrated;
+3. builds only the GSI system image;
+4. names the result with `-p11-stock-kernel`.
+
+It intentionally does **not** build, patch or flash a kernel.
+
+For an existing synced source tree:
 
 ```bash
-git ls-remote git@github.com:remappingbridge/trebuchet-lineage-22.2.git HEAD
+bash lineage_build_unified/build_unified.sh treble nosync p11 64GN
 ```
 
-## Target
+## Runtime rule
 
-For the P11 GApps/no-root ARM64 GSI:
+The P11 profile requires the Lenovo stock boot/kernel. Do not install the
+recompiled Magic Trackpad kernel together with this GSI.
+
+After installation, enable the bridge and reconnect the Magic Trackpad:
 
 ```bash
-bash lineage_build_unified/build_unified.sh treble 64GN
+adb root
+adb wait-for-device
+adb shell setprop persist.bluetooth.p11_mt2_bridge true
 ```
 
-Before physical validation, verify the pinned repositories:
+Validate the stock-kernel Wi-Fi path with:
 
 ```bash
-bash lineage_build_unified/verify_p11_magic_trackpad.sh
+bash lineage_build_unified/p11/verify_stock_wifi_runtime.sh
 ```
 
-See `P11_MAGIC_TRACKPAD.md` before building.
+The verifier requires `4.19.157-perf+`, checks `wlan0`, forces a scan, and
+fails if no BSSIDs are returned.
+
+Detailed rationale and migration notes are in
+[P11_WIFI_TRACKPAD.md](P11_WIFI_TRACKPAD.md). The bridge implementation is
+documented in [p11/mt2-bridge/README.md](p11/mt2-bridge/README.md).
