@@ -37,6 +37,22 @@ check_repo "vendor/hardware_overlay"     "2b84b6e5e6f04fbcf2d122bf985753c6b9c9bb
 
 check_repo "lineage_patches_unified"     "20734839c3c228cde47f408d1583a10d067d1990"     "Andy Yan LineageOS 22 Light patches"
 
+BT_CO="packages/modules/Bluetooth/system/btif/co/bta_hh_co.cc"
+BRIDGE_HEADER="packages/modules/Bluetooth/system/btif/co/p11_mt2_bridge.h"
+
+if [ ! -f "$BRIDGE_HEADER" ]; then
+    echo "FAIL: P11 MT2 bridge header is not installed" >&2
+    exit 1
+fi
+
+if ! grep -q 'p11_mt2_bridge.h' "$BT_CO"; then
+    echo "FAIL: P11 MT2 bridge is not integrated into Bluetooth UHID writer" >&2
+    exit 1
+fi
+
+python3 ./lineage_build_unified/p11/mt2-bridge/apply.py "$PWD" --check
+echo "OK: P11 Bluetooth/UHID MT2 bridge"
+
 echo
-echo "All pinned P11 sources match."
+echo "All pinned P11 sources and the MT2 bridge match."
 echo "Note: the LineageOS 22.2 platform manifest and MindTheGapps vic branch are not date-pinned."
