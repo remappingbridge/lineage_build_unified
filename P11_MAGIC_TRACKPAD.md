@@ -1,5 +1,13 @@
 # Lenovo Tab P11 — LineageOS 22 Light + Magic Trackpad experiment
 
+> Wi-Fi-preserving path (2026-10-02): use branch
+> `experimental/p11-stock-kernel-wifi-trackpad` and build with
+> `build_unified.sh treble p11 64GN`. The P11 profile applies the Bluetooth/UHID
+> MT2 bridge and requires the Lenovo stock `4.19.157-perf+` boot/kernel.
+> Do not pair this system image with the recompiled Magic Trackpad boot image.
+> See [P11_WIFI_TRACKPAD.md](P11_WIFI_TRACKPAD.md).
+
+
 ## Current physical result and next candidate — 2026-10-02
 
 The first build completed and booted. The user reports that the other baseline
