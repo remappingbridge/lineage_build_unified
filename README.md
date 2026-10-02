@@ -2,7 +2,14 @@
 
 This branch is a controlled Lenovo Tab P11 experiment based on Andy Yan's `lineage-22-light` build recipe.
 
-The only intentional functional customization is the replacement of LineageOS Trebuchet with the pinned Magic Trackpad implementation from:
+**2026-10-02 update:** the first GSI built and booted; Wi-Fi and pointer work, but
+2/3/4-finger gestures fail because the stock kernel exposes no MT2 multitouch.
+An opt-in Bluetooth/UHID bridge is now available in
+[p11/mt2-bridge](p11/mt2-bridge/README.md). It has host tests; Android compilation
+and physical acceptance remain pending. Follow its incremental instructions for
+the existing build tree. It is not automatically applied by the full build recipe.
+
+The original build recipe's functional customization is the replacement of LineageOS Trebuchet with the pinned Magic Trackpad implementation from:
 
 ```text
 remappingbridge/trebuchet-lineage-22.2

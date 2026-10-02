@@ -1,5 +1,18 @@
 # Lenovo Tab P11 — LineageOS 22 Light + Magic Trackpad experiment
 
+## Current physical result and next candidate — 2026-10-02
+
+The first build completed and booted. The user reports that the other baseline
+functions work, but gestures with 2/3/4 fingers do not. Baseline diagnostics
+confirm `004c:0265` bound to `hid-generic`, without ABS_MT axes. This does not yet
+validate the Trebuchet customization. Gesture acceptance remains open.
+
+The next candidate is the opt-in [Bluetooth/UHID bridge](p11/mt2-bridge/README.md),
+which preserves the current kernel and maps MT2 reports to standard multitouch.
+Host tests passed; full Android compilation and tablet tests are pending.
+The original recipe and source pins below remain unchanged; the bridge is an
+explicit additional patch, not automatically applied during sync/build.
+
 ## Goal
 
 Build a LineageOS 22.2 Light GSI for the Lenovo Tab P11 using Andy Yan's Light build recipe while changing only the Trebuchet/Quickstep behavior needed for the Magic Trackpad four-finger vertical gestures.

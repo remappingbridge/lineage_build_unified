@@ -1,0 +1,70 @@
+--- a/system/btif/co/bta_hh_co.cc
++++ b/system/btif/co/bta_hh_co.cc
+@@ -50,6 +50,7 @@
+ #include "osi/include/fixed_queue.h"
+ #include "osi/include/osi.h"
+ #include "osi/include/properties.h"
++#include "p11_mt2_bridge.h"
+ #include "storage/config_keys.h"
+ #include "types/raw_address.h"
+ 
+@@ -69,6 +70,8 @@
+ #define BTA_HH_UHID_READY_SHORT_DISCONN_TIMEOUT_MS 2000
+ 
+ using namespace bluetooth;
++
++static p11_mt2::Bridge p11_mt2_bridge;
+ 
+ static constexpr char kDevPath[] = "/dev/uhid";
+ static constexpr char kPropertyWaitMsAfterUhidOpen[] = "bluetooth.hid.wait_ms_after_uhid_open";
+@@ -182,6 +185,19 @@
+ 
+ /*Internal function to perform UHID write and error checking*/
+ static int uhid_write(int fd, const struct uhid_event* ev, size_t len) {
++  // Opt-in compatibility for the P11 kernel without native MT2 support.
++  // Queued input events are allocated to their wire length, not sizeof(uhid_event).
++  struct uhid_event translated = {};
++  if (len < sizeof(translated.type) || len > sizeof(translated)) return -EINVAL;
++  std::memcpy(&translated, ev, len);
++  const bool enable_mt2 = translated.type == UHID_CREATE2 &&
++          osi_property_get_bool(p11_mt2::kProperty, false);
++  if (!p11_mt2_bridge.Prepare(fd, translated, translated, len, enable_mt2)) return 0;
++  ev = &translated;
++  if (ev->type == UHID_CREATE2 && p11_mt2_bridge.Active(fd)) {
++    log::info("P11 MT2: standard multitouch descriptor enabled on fd={}", fd);
++  }
++
+   ssize_t ret;
+   OSI_NO_INTR(ret = write(fd, ev, len));
+ 
+@@ -290,8 +306,30 @@
+     return -errno;
+   }
+ 
++  // The synthetic HID descriptor owns feature report 2 locally.
++  struct uhid_event feature_reply = {};
++  if (p11_mt2_bridge.FeatureReply(p_uhid->fd, ev, feature_reply)) {
++    return uhid_write(p_uhid->fd, &feature_reply,
++                      uhid_calc_msg_len(&feature_reply, feature_reply.u.get_report_reply.size));
++  }
++#if ENABLE_UHID_SET_REPORT
++  if (p11_mt2_bridge.Active(p_uhid->fd) && ev.type == UHID_SET_REPORT) {
++    struct uhid_event reply = {};
++    reply.type = UHID_SET_REPORT_REPLY;
++    reply.u.set_report_reply.id = ev.u.set_report.id;
++    reply.u.set_report_reply.err = EOPNOTSUPP;
++    return uhid_write(p_uhid->fd, &reply, uhid_calc_msg_len(&reply, 0));
++  }
++#endif
++  if (p11_mt2_bridge.Active(p_uhid->fd) && ev.type == UHID_OUTPUT) return 0;
++
+   switch (ev.type) {
+     case UHID_START:
++      if (p11_mt2_bridge.Active(p_uhid->fd)) {
++        uint8_t feature[] = {0xf1, 0x02, 0x01};
++        btif_hh_setreport(p_uhid, BTHH_FEATURE_REPORT, sizeof(feature), feature);
++        log::info("P11 MT2: requested Bluetooth multitouch mode F1 02 01");
++      }
+       log::verbose("UHID_START from uhid-dev\n");
+       if (!com::android::bluetooth::flags::hid_report_queuing()) {
+         // we can ignore START event, no one is ready to listen anyway.
