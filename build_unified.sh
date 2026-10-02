@@ -22,6 +22,7 @@ fi
 
 NOSYNC=false
 PERSONAL=false
+P11=false
 SIGNABLE=true
 for var in "${@:2}"
 do
@@ -34,7 +35,16 @@ do
         PERSONAL=true
         SIGNABLE=false
     fi
+    if [ ${var} == "p11" ]
+    then
+        P11=true
+    fi
 done
+
+if ${P11} && [ "${MODE}" != "treble" ]; then
+    echo "The p11 profile is only valid in treble mode - exiting"
+    exit 1
+fi
 if [ ! -d "$HOME/.android-certs" ]; then
     read -n1 -r -p $"\$HOME/.android-certs not found - CTRL-C to exit, or any other key to continue"
     echo ""
@@ -96,6 +106,15 @@ finalize_treble() {
     :
 }
 
+apply_p11_profile() {
+    echo "Applying Lenovo Tab P11 stock-kernel Wi-Fi + Magic Trackpad profile"
+    python3 ./lineage_build_unified/p11/mt2-bridge/apply.py "$PWD"
+    bash ./lineage_build_unified/verify_p11_magic_trackpad.sh
+    echo ""
+    echo "P11 profile rule: build/flash system only; keep or restore the stock Lenovo boot image."
+    echo "The stock 4.19.157-perf+ kernel is required to preserve the vendor Qualcomm WLAN path."
+}
+
 build_device() {
     brunch ${1}
     mv $OUT/lineage-*.zip ~/build-output/lineage-22.2-$BUILD_DATE-UNOFFICIAL-${1}$($PERSONAL && echo "-personal" || echo "").zip
@@ -119,7 +138,7 @@ build_treble() {
         SIGNED=true
         echo ""
     fi
-    mv $OUT/system.img ~/build-output/lineage-22.2-$BUILD_DATE-UNOFFICIAL-${TARGET}$(${PERSONAL} && echo "-personal" || echo "")$(${SIGNED} && echo "-signed" || echo "").img
+    mv $OUT/system.img ~/build-output/lineage-22.2-$BUILD_DATE-UNOFFICIAL-${TARGET}$(${P11} && echo "-p11-stock-kernel" || echo "")$(${PERSONAL} && echo "-personal" || echo "")$(${SIGNED} && echo "-signed" || echo "").img
 }
 
 if ${NOSYNC}
@@ -145,10 +164,15 @@ else
     echo ""
 fi
 
+if ${P11}
+then
+    apply_p11_profile
+    echo ""
+fi
 
 for var in "${@:2}"
 do
-    if [ ${var} == "nosync" ] || [ ${var} == "personal" ]
+    if [ ${var} == "nosync" ] || [ ${var} == "personal" ] || [ ${var} == "p11" ]
     then
         continue
     fi
