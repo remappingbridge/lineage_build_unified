@@ -1,5 +1,11 @@
 # P11 Magic Trackpad 2 — opt-in Bluetooth/UHID compatibility bridge
 
+> P11 Wi-Fi rule: this bridge is the replacement for the custom-kernel Trackpad
+> path. Build it with the `p11` profile and keep/restore the Lenovo stock boot
+> kernel. The recompiled Trackpad kernel is known to cross the Wi-Fi regression
+> boundary on this tablet.
+
+
 Status (2026-10-02): **implementation and host tests complete; full Android build
 and physical validation pending**. This is an experimental candidate, not a
 claim that two/three/four-finger gestures have passed on the tablet.
